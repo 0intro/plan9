@@ -12,7 +12,7 @@ size_t fread(void *p, size_t recl, size_t nrec, FILE *f){
 
 	s=(char *)p;
 	n=recl*nrec;
-	while(n>0){
+	while(n>0 && f->state!=CLOSED){
 		d=f->wp-f->rp;
 		if(d>0){
 			if(d>n)
@@ -20,10 +20,11 @@ size_t fread(void *p, size_t recl, size_t nrec, FILE *f){
 			memcpy(s, f->rp, d);
 			f->rp+=d;
 		}else{
-			if(n >= BIGN && f->state==RD && !(f->flags&STRING) && f->buf!=f->unbuf){
+			if(f->buf==f->unbuf || (n >= BIGN && f->state==RD && !(f->flags&STRING))){
 				d=read(f->fd, s, n);
 				if(d<=0){
-					f->state=(d==0)?END:ERR;
+					if(f->state!=CLOSED)
+						f->state=(d==0)?END:ERR;
 					goto ret;
 				}
 			}else{

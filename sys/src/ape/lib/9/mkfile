@@ -4,9 +4,11 @@ APE=/sys/src/ape
 LIB=/$objtype/lib/ape/lib9.a
 OFILES=errstr.$O\
 	bind.$O\
+	crypt.$O\
 	getcallerpc.$O\
 	getfcr.$O\
 	mount.$O\
+	nsec.$O\
 	rendezvous.$O\
 	rfork.$O\
 	segattach.$O\
@@ -21,10 +23,11 @@ OFILES=errstr.$O\
 	u32.$O\
 	u64.$O\
 	unmount.$O\
+	wait.$O\
 
 </sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_PLAN9_SOURCE
 
 %.$O:	$objtype/%.s
 	$AS $prereq
@@ -49,3 +52,6 @@ u32.$O: ../../../libc/port/u32.c
 
 u64.$O: ../../../libc/port/u64.c
 	$CC $CFLAGS -I. ../../../libc/port/u64.c
+
+crypt.$O: ../../../libc/port/crypt.c
+	$CC $CFLAGS -I. ../../../libc/port/crypt.c

@@ -57,7 +57,7 @@ execve(const char *name, const char *argv[], const char *envp[])
 	 * are ignored, in case the current value of the
 	 * variable ignored some.
 	 */
-	f = _CREATE("#e/_sighdlr", OWRITE, 0666);
+	f = _CREATE("/env/_sighdlr", OWRITE, 0666);
 	if(f >= 0){
 		ss = buf;
 		for(i = 0; i <=MAXSIG && ss < &buf[sizeof(buf)]-5; i++) {
@@ -70,16 +70,16 @@ execve(const char *name, const char *argv[], const char *envp[])
 		_CLOSE(f);
 	}
 	if(envp){
-		strcpy(nam, "#e/");
-		for(e = (char **)envp; (ss = *e); e++) {
+		strcpy(nam, "/env/");
+		for(e = (char**)envp; (ss = *e); e++) {
 			se = strchr(ss, '=');
 			if(!se || ss==se)
 				continue;	/* what is name? value? */
 			n = se-ss;
-			if(n >= sizeof(nam)-3)
-				n = sizeof(nam)-3-1;
-			memcpy(nam+3, ss, n);
-			nam[3+n] = 0;
+			if(n >= sizeof(nam)-5)
+				n = sizeof(nam)-(5 + 1);
+			memcpy(nam+5, ss, n);
+			nam[5+n] = 0;
 			f = _CREATE(nam, OWRITE, 0666);
 			if(f < 0)
 				continue;

@@ -2,7 +2,7 @@
 
 extern int	_SEGBRK(void*, void*);
 
-int
+void*
 segbrk(void *saddr, void *addr)
 {
 	return _SEGBRK(saddr, addr);

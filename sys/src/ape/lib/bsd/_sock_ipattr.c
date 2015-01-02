@@ -1,7 +1,7 @@
 /* posix */
 #include <sys/types.h>
 #include <unistd.h>
-#include <ctype.h>
+#include <string.h>
 
 /* bsd extensions */
 #include <sys/uio.h>
@@ -16,30 +16,11 @@
 int
 _sock_ipattr(char *name)
 {
-	char *p;
-	int dot = 0;
-	int alpha = 0;
+	struct in6_addr ia6;
 
-	for(p = name; *p; p++){
-		if(isdigit(*p)){
-			;
-		}else if(isalpha(*p) || *p == '-')
-			alpha = 1;
-		else if(*p == '.')
-			dot = 1;
-		else
-			return Tsys;
-	}
-
-	if(alpha){
-		if(dot)
-			return Tdom;
-		else
-			return Tsys;
-	}
-
-	if(dot)
+	if(inet_pton(AF_INET6, name, &ia6) == 1)
 		return Tip;
-	else
-		return Tsys;
+	if(strchr(name, '.') != nil)
+		return Tdom;
+	return Tsys;
 }

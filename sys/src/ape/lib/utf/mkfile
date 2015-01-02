@@ -4,6 +4,9 @@ APE=/sys/src/ape
 LIB=/$objtype/lib/ape/libutf.a
 
 OFILES=\
+	getfields.$O\
+	gettokens.$O\
+	rerrstr.$O\
 	rune.$O\
 	runestrcat.$O\
 	runestrchr.$O\

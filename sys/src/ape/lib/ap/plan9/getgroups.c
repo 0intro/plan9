@@ -3,8 +3,9 @@
 #include <errno.h>
 
 int
-getgroups(int, gid_t [])
+getgroups(int gidsize, gid_t grouplist[])
 {
+	USED(gidsize, grouplist);
 	errno = EINVAL;
 	return -1;
 }

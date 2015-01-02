@@ -42,11 +42,8 @@ _sock_newrock(int fd)
 	r = _sock_findrock(fd, &d);
 	if(r == 0){
 		r = malloc(sizeof(Rock));
-		if(r == 0)
-			return 0;
-		r->dev = d.st_dev;
-		r->inode = d.st_ino;
-		r->other = -1;
+		if(r == nil)
+			return nil;
 		r->next = _sock_rock;
 		_sock_rock = r;
 	}
@@ -115,6 +112,7 @@ socket(int domain, int stype, int protocol)
 
 	switch(domain){
 	case PF_INET:
+	case PF_INET6:
 		/* get a free network directory */
 		switch(stype){
 		case SOCK_DGRAM:

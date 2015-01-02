@@ -9,7 +9,7 @@ typedef struct Ureg Ureg;
 enum {
 	READMAX = 8192,			/* read at most this much with _READ */
 	PERFDMAX = 2*READMAX,		/* stop _READing an fd when it has this much */
-	INITBUFS = 4,			/* allow enough room for this many PERFDMAX */
+	INITBUFS = 90,			/* allow enough room for this many PERFDMAX */
 };
 
 typedef struct Muxbuf {

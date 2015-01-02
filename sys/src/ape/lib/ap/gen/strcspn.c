@@ -5,7 +5,8 @@
 size_t
 strcspn(const char *s, const char *b)
 {
-	char map[N], *os;
+	char map[N];
+	const char *os;
 
 	memset(map, 0, N);
 	for(;;) {
@@ -13,7 +14,7 @@ strcspn(const char *s, const char *b)
 		if(*b++ == 0)
 			break;
 	}
-	os = (char *)s;
+	os = s;
 	while(map[*(unsigned char*)s++] == 0)
 		;
 	return s - os - 1;

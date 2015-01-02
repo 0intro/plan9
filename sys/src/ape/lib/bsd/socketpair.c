@@ -9,8 +9,9 @@
 #include <sys/socket.h>
 
 int
-socketpair(int domain, int , int , int *sv)
+socketpair(int domain, int type, int protocol, int *sv)
 {
+	USED(protocol, type);
 	switch(domain){
 	case PF_UNIX:
 		return pipe(sv);

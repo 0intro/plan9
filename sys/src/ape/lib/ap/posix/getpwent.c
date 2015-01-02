@@ -49,14 +49,16 @@ pwdecode(char *p)
 	passwd.pw_dir = p;
 	p = pwskip(p);
 	passwd.pw_shell = p;
-	pwskip(p);
+	p = pwskip(p);
+	USED(p);
+
 	return(&passwd);
 }
 
 struct passwd *
 getpwent(void)
 {
-	register char *p;
+	char *p;
 
 	if (pwf == NULL) {
 		if( (pwf = fopen( PASSWD, "r" )) == NULL )

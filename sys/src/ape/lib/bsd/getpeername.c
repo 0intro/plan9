@@ -16,25 +16,35 @@
 
 #include "priv.h"
 
+static int
+connected(Rock *r, int len)
+{
+	static struct sockaddr niladdr;
+
+	return memcmp(&r->raddr, &niladdr, len) != 0;
+}
+
 int
 getpeername(int fd, void *addr, int *alen)
 {
 	Rock *r;
 	int i;
-	struct sockaddr_in *rip;
 	struct sockaddr_un *runix;
 
 	r = _sock_findrock(fd, 0);
-	if(r == 0){
+	if(r == nil){
 		errno = ENOTSOCK;
 		return -1;
 	}
 
 	switch(r->domain){
 	case PF_INET:
-		rip = (struct sockaddr_in*)&r->raddr;
-		memmove(addr, rip, sizeof(struct sockaddr_in));
 		*alen = sizeof(struct sockaddr_in);
+		memmove(addr, &r->raddr, *alen);
+		break;
+	case PF_INET6:
+		*alen = sizeof(struct sockaddr_in6);
+		memmove(addr, &r->raddr, *alen);
 		break;
 	case PF_UNIX:
 		runix = (struct sockaddr_un*)&r->raddr;
@@ -44,6 +54,12 @@ getpeername(int fd, void *addr, int *alen)
 		break;
 	default:
 		errno = EAFNOSUPPORT;
+		return -1;
+	}
+
+	if(!connected(r, *alen)){
+		errno = ENOTCONN;
+		memset(&addr, 0, *alen); /* python depends on this */
 		return -1;
 	}
 	return 0;

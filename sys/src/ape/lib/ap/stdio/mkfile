@@ -2,6 +2,7 @@ APE=/sys/src/ape
 <$APE/config
 LIB=/$objtype/lib/ape/libap.a
 OFILES=\
+	_IO_newfile.$O\
 	_IO_getc.$O\
 	_IO_putc.$O\
 	_dtoa.$O\
@@ -66,4 +67,4 @@ OFILES=\
 </sys/src/cmd/mksyslib
 
 # -w draws lots of "result of operation not used" warnings
-CFLAGS=-c -D_POSIX_SOURCE -FTV
+CFLAGS=-FTVc -D_POSIX_SOURCE

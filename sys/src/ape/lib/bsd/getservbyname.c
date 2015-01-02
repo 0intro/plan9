@@ -49,8 +49,10 @@ getservbyname(char *name, char *proto)
 	}
 
 	/* construct the query, always expect an ip# back */
-	if(num)
+	if(num && proto != nil)
 		snprintf(buf, sizeof buf, "!port=%s %s=*", name, proto);
+	else if(num)
+		snprintf(buf, sizeof buf, "!port=%s", name);
 	else
 		snprintf(buf, sizeof buf, "!%s=%s port=*", proto, name);
 
@@ -76,10 +78,13 @@ getservbyname(char *name, char *proto)
 		if(p == 0)
 			break;
 		*p++ = 0;
-		if(strcmp(bp, proto) == 0){
+		if(proto != nil && strcmp(bp, proto) == 0){
 			if(nn < Nname)
 				nptr[nn++] = p;
-		} else if(strcmp(bp, "port") == 0){
+		} else if(strcmp(bp, "port") != 0){
+			if(nn < Nname)
+				nptr[nn++] = p;
+		} else{
 			s.s_port = htons(atoi(p));
 		}
 		while(*p && *p != ' ')

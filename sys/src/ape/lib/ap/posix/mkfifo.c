@@ -3,8 +3,9 @@
 #include	<errno.h>
 
 int
-mkfifo(char *, mode_t)
+mkfifo(char *path, mode_t mode)
 {
+	USED(path, mode);
 	errno = 0;
 	return -1;
 }

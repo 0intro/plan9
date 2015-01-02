@@ -73,7 +73,7 @@ qlock(QLock *q)
 	unlock(&q->lock);
 
 	/* wait */
-	while((*_rendezvousp)((ulong)mp, 1) == ~0)
+	while((*_rendezvousp)(mp, (void*)1) == (void*)~0)
 		;
 	mp->inuse = 0;
 }
@@ -84,6 +84,8 @@ qunlock(QLock *q)
 	QLp *p;
 
 	lock(&q->lock);
+	if (q->locked == 0)
+		abort();
 	p = q->head;
 	if(p != nil){
 		/* wakeup head waiting process */
@@ -91,7 +93,7 @@ qunlock(QLock *q)
 		if(q->head == nil)
 			q->tail = nil;
 		unlock(&q->lock);
-		while((*_rendezvousp)((ulong)p, 0x12345) == ~0)
+		while((*_rendezvousp)(p, (void*)0x12345) == (void*)~0)
 			;
 		return;
 	}
@@ -140,7 +142,7 @@ rlock(RWLock *q)
 	unlock(&q->lock);
 
 	/* wait in kernel */
-	while((*_rendezvousp)((ulong)mp, 1) == ~0)
+	while((*_rendezvousp)(mp, (void*)1) == (void*)~0)
 		;
 	mp->inuse = 0;
 }
@@ -183,7 +185,7 @@ runlock(RWLock *q)
 	unlock(&q->lock);
 
 	/* wakeup waiter */
-	while((*_rendezvousp)((ulong)p, 0) == ~0)
+	while((*_rendezvousp)(p, 0) == (void*)~0)
 		;
 }
 
@@ -213,7 +215,7 @@ wlock(RWLock *q)
 	unlock(&q->lock);
 
 	/* wait in kernel */
-	while((*_rendezvousp)((ulong)mp, 1) == ~0)
+	while((*_rendezvousp)(mp, (void*)1) == (void*)~0)
 		;
 	mp->inuse = 0;
 }
@@ -252,7 +254,7 @@ wunlock(RWLock *q)
 		if(q->head == nil)
 			q->tail = nil;
 		unlock(&q->lock);
-		while((*_rendezvousp)((ulong)p, 0) == ~0)
+		while((*_rendezvousp)(p, 0) == (void*)~0)
 			;
 		return;
 	}
@@ -265,7 +267,7 @@ wunlock(RWLock *q)
 		p = q->head;
 		q->head = p->next;
 		q->readers++;
-		while((*_rendezvousp)((ulong)p, 0) == ~0)
+		while((*_rendezvousp)(p, 0) == (void*)~0)
 			;
 	}
 	if(q->head == nil)
@@ -303,7 +305,7 @@ rsleep(Rendez *r)
 		if(r->l->head == nil)
 			r->l->tail = nil;
 		unlock(&r->l->lock);
-		while((*_rendezvousp)((ulong)t, 0x12345) == ~0)
+		while((*_rendezvousp)(t, (void*)0x12345) == (void*)~0)
 			;
 	}else{
 		r->l->locked = 0;
@@ -311,7 +313,7 @@ rsleep(Rendez *r)
 	}
 
 	/* wait for a wakeup */
-	while((*_rendezvousp)((ulong)me, 1) == ~0)
+	while((*_rendezvousp)(me, (void*)1) == (void*)~0)
 		;
 	me->inuse = 0;
 }

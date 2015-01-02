@@ -103,9 +103,9 @@ _multadd(Bigint *b, int m, int a)	/* multiply by m and add a */
 	}
 
  int
-_hi0bits(register unsigned long x)
+_hi0bits(unsigned long x)
 {
-	register int k = 0;
+	int k = 0;
 
 	if (!(x & 0xffff0000)) {
 		k = 16;
@@ -134,8 +134,8 @@ _hi0bits(register unsigned long x)
  static int
 lo0bits(unsigned long *y)
 {
-	register int k;
-	register unsigned long x = *y;
+	int k;
+	unsigned long x = *y;
 
 	if (x & 7) {
 		if (x & 1)
