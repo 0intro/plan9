@@ -4,8 +4,9 @@
 #include	<sys/limits.h>
 
 long
-pathconf(const char *, int name)
+pathconf(const char *path, int name)
 {
+	USED(path);
 	switch(name)
 	{
 	case _PC_LINK_MAX:
@@ -44,8 +45,9 @@ pathconf(const char *, int name)
 }
 
 long
-fpathconf(int, int name)
+fpathconf(int fd, int name)
 {
+	USED(fd);
 	return pathconf(0, name);
 }
 

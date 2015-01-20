@@ -8,6 +8,9 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <sys/stat.h>
+#define _SUSV2_SOURCE
+#include <inttypes.h>
 
 /* socket extensions */
 #include <sys/uio.h>
@@ -39,16 +42,17 @@ listenproc(Rock *r, int fd)
 	char *p;
 	char listen[Ctlsize];
 	char name[Ctlsize];
+	void *v;
 
 	switch(r->stype){
+	default:
+		errno = EOPNOTSUPP;
+		return -1;
 	case SOCK_DGRAM:
 		net = "udp";
 		break;
 	case SOCK_STREAM:
 		net = "tcp";
-		break;
-	default:
-		net = "gok";
 		break;
 	}
 
@@ -81,11 +85,14 @@ listenproc(Rock *r, int fd)
 			_muxsid = getpgrp();
 		} else
 			setpgid(getpid(), _muxsid);
-		_RENDEZVOUS(2, _muxsid);
+		while(_RENDEZVOUS((void*)2, (void*)_muxsid) == (void*)~0)
+			;
 		break;
 	default:
 		atexit(_killmuxsid);
-		_muxsid = _RENDEZVOUS(2, 0);
+		while((v = _RENDEZVOUS((void*)2, 0)) == (void*)~0)
+			;
+		_muxsid = (int)(uintptr_t)v;
 		close(pfd[1]);
 		close(nfd);
 		return 0;
@@ -116,12 +123,11 @@ listenproc(Rock *r, int fd)
 }
 
 int
-listen(int fd, int)
+listen(int fd, int /*backlog*/)
 {
 	Rock *r;
-	int n, cfd;
+	int n, cfd, port;
 	char msg[128];
-	struct sockaddr_in *lip;
 	struct sockaddr_un *lunix;
 
 	r = _sock_findrock(fd, 0);
@@ -132,20 +138,20 @@ listen(int fd, int)
 
 	switch(r->domain){
 	case PF_INET:
+	case PF_INET6:
 		cfd = open(r->ctl, O_RDWR);
 		if(cfd < 0){
 			errno = EBADF;
 			return -1;
 		}
-		lip = (struct sockaddr_in*)&r->addr;
-		if(1 || lip->sin_port >= 0) {	/* sin_port is unsigned */
+		_sock_ntop(r->domain, &r->addr, nil, 0, &port);
+		if(port != 0 && port != 0xffff) {
 			if(write(cfd, "bind 0", 6) < 0) {
 				errno = EGREG;
 				close(cfd);
 				return -1;
 			}
-			snprintf(msg, sizeof msg, "announce %d",
-				ntohs(lip->sin_port));
+			snprintf(msg, sizeof msg, "announce %d", port);
 		}
 		else
 			strcpy(msg, "announce *");

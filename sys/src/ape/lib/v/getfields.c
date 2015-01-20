@@ -27,8 +27,8 @@ static char last_sep[256];
 char *
 setfields(char *arg)
 {
-	register unsigned char *s;
-	register i;
+	unsigned char *s;
+	int i;
 
 	for(i = 1, s = (unsigned char *)last_sep; i < 256; i++)
 		if(is_sep[i])
@@ -47,9 +47,9 @@ setfields(char *arg)
 int
 getfields(char *ss, char **sp, int nptrs)
 {
-	register unsigned char *s = (unsigned char *)ss;
-	register unsigned char **p = (unsigned char **)sp;
-	register unsigned c;
+	unsigned char *s = (unsigned char *)ss;
+	unsigned char **p = (unsigned char **)sp;
+	unsigned c;
 
 	c = 0;
 	for(;;){
@@ -70,9 +70,9 @@ getfields(char *ss, char **sp, int nptrs)
 int
 getmfields(char *ss, char **sp, int nptrs)
 {
-	register unsigned char *s = (unsigned char *)ss;
-	register unsigned char **p = (unsigned char **)sp;
-	register unsigned c;
+	unsigned char *s = (unsigned char *)ss;
+	unsigned char **p = (unsigned char **)sp;
+	unsigned c;
 
 	if(nptrs <= 0)
 		return(0);

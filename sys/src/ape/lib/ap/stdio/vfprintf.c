@@ -6,6 +6,9 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#define _SUSV2_SOURCE
+#include <inttypes.h>
+
 /*
  * Leading flags
  */
@@ -202,13 +205,13 @@ vfprintf(FILE *f, const char *s, va_list args)
 			nprint++;
 		}
 	}
-	return ferror(f)? -1: nprint;;
+	return ferror(f)? -1: nprint;
 }
 
 static int
 ocvt_c(FILE *f, va_list *args, int flags, int width, int precision)
 {
-#pragma ref precision
+	USED(precision);
 	int i;
 
 	if(!(flags&LEFT)) for(i=1; i<width; i++) putc(' ', f);
@@ -259,9 +262,7 @@ ocvt_s(FILE *f, va_list *args, int flags, int width, int precision)
 static int
 ocvt_n(FILE *f, va_list *args, int flags, int width, int precision)
 {
-#pragma ref f
-#pragma ref width
-#pragma ref precision
+	USED(f, width, precision);
 	if(flags&SHORT)
 		*va_arg(*args, short *) = nprint;
 	else if(flags&LONG)
@@ -295,7 +296,7 @@ ocvt_fixed(FILE *f, va_list *args, int flags, int width, int precision,
 	int nout, npad, nlzero;
 
 	if(sgned){
-		if(flags&PTR) snum = (long)va_arg(*args, void *);
+		if(flags&PTR) snum = (uintptr_t)va_arg(*args, void *);
 		else if(flags&SHORT) snum = va_arg(*args, short);
 		else if(flags&LONG) snum = va_arg(*args, long);
 		else if(flags&VLONG) snum = va_arg(*args, long long);
@@ -311,7 +312,7 @@ ocvt_fixed(FILE *f, va_list *args, int flags, int width, int precision,
 		}
 	} else {
 		sign = "";
-		if(flags&PTR) num = (long)va_arg(*args, void *);
+		if(flags&PTR) num = (uintptr_t)va_arg(*args, void *);
 		else if(flags&SHORT) num = va_arg(*args, unsigned short);
 		else if(flags&LONG) num = va_arg(*args, unsigned long);
 		else if(flags&VLONG) num = va_arg(*args, unsigned long long);

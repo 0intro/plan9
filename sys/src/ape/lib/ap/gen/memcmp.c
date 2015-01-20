@@ -3,7 +3,7 @@
 int
 memcmp(const void *a1, const void *a2, size_t n)
 {
-	char *s1, *s2;
+	const char *s1, *s2;
 	unsigned c1, c2;
 
 	s1 = a1;

@@ -21,7 +21,8 @@ int fflush(FILE *f){
 	case WR:
 		cnt=(f->flags&LINEBUF?f->lp:f->wp)-f->buf;
 		if(cnt && write(f->fd, f->buf, cnt)!=cnt){
-			f->state=ERR;
+			if(f->state != CLOSED)
+				f->state = ERR;
 			return EOF;
 		}
 		f->rp=f->wp=f->buf;

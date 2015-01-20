@@ -12,7 +12,8 @@ char *rdline(FILE *f, char **ep){
 	default:	/* CLOSED, WR, ERR, EOF */
 		return NULL;
 	case OPEN:
-		_IO_setvbuf(f);
+		if(_IO_setvbuf(f)!=0)
+			return NULL;
 	case RDWR:
 		f->state=RD;
 	case RD:
@@ -46,6 +47,8 @@ char *rdline(FILE *f, char **ep){
 				break;
 			}
 			cnt=read(f->fd, f->wp, cnt);
+			if(f->state==CLOSED)
+				return NULL;
 			if(cnt==-1){
 				f->state=ERR;
 				return NULL;

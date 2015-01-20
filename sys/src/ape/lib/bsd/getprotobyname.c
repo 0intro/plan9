@@ -24,7 +24,8 @@ enum
 
 static struct protoent r;
 
-struct protoent *getprotobyname(const char *name) {
+struct protoent*
+getprotobyname(const char *name) {
 	int fd, i, m;
 	char *p, *bp;
 	int nn, na;

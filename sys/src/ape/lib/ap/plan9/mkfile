@@ -26,6 +26,7 @@ OFILES=\
 	close.$O\
 	convM2D.$O\
 	convD2M.$O\
+	copysign.$O\
 	creat.$O\
 	ctermid.$O\
 	ctime.$O\

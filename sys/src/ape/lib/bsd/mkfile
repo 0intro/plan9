@@ -9,10 +9,13 @@ OFILES=\
 	connect.$O\
 	endhostent.$O\
 	ffs.$O\
+	gai_strerr.$O\
+	getaddrinfo.$O\
 	getdtablesize.$O\
-	gethostbyname.$O\
 	gethostbyaddr.$O\
+	gethostbyname.$O\
 	gethostname.$O\
+	getnameinfo.$O\
 	getopt.$O\
 	getpeername.$O\
 	getprotobyname.$O\
@@ -20,9 +23,13 @@ OFILES=\
 	getservbyname.$O\
 	getsockname.$O\
 	gettimeofday.$O\
+	herror.$O\
 	inet_addr.$O\
 	inet_ntoa.$O\
+	inet_ntop.$O\
+	inet_pton.$O\
 	ioctl.$O\
+	ip6const.$O\
 	listen.$O\
 	lstat.$O\
 	mktemp.$O\
@@ -39,6 +46,7 @@ OFILES=\
 	shutdown.$O\
 	_sock_ingetaddr.$O\
 	_sock_ipattr.$O\
+	_sock_ntop.$O\
 	_sock_srv.$O\
 	strcasecmp.$O\
 	strncasecmp.$O\

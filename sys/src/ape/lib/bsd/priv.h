@@ -1,5 +1,8 @@
 typedef struct Rock Rock;
 
+#define nil	((void*)0)
+#define nelem(a)	(sizeof(a)/sizeof((a)[0]))
+
 enum
 {
 	Ctlsize=	128,
@@ -41,6 +44,7 @@ extern void	_sock_srvname(char*, char*);
 extern int	_sock_srv(char*, int);
 extern int	_sock_data(int, char*, int, int, int, Rock**);
 extern int	_sock_ipattr(char*);
-extern void	_sock_ingetaddr(Rock*, struct sockaddr_in*, int*, char*);
+extern void	_sock_ingetaddr(Rock*, struct sockaddr*, int*, char*);
+extern void	_sock_ntop(int, const void*, char*, int , int*);
 
 extern void	_syserrno(void);

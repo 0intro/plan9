@@ -12,7 +12,7 @@ size_t fwrite(const void *p, size_t recl, size_t nrec, FILE *f){
 
 	s=(char *)p;
 	n=recl*nrec;
-	while(n>0){
+	while(n>0 && f->state!=CLOSED){
 		d=f->rp-f->wp;
 		if(d>0){
 			if(d>n)
@@ -20,13 +20,14 @@ size_t fwrite(const void *p, size_t recl, size_t nrec, FILE *f){
 			memcpy(f->wp, s, d);
 			f->wp+=d;
 		}else{
-			if(n>=BIGN && f->state==WR && !(f->flags&(STRING|LINEBUF)) && f->buf!=f->unbuf){
+			if(f->buf==f->unbuf || (n>=BIGN && f->state==WR && !(f->flags&(STRING|LINEBUF)))){
 				d=f->wp-f->buf;
 				if(d>0){
 					if(f->flags&APPEND)
 						lseek(f->fd, 0L, SEEK_END);
 					if(write(f->fd, f->buf, d)!=d){
-						f->state=ERR;
+						if(f->state!=CLOSED)
+							f->state=ERR;
 						goto ret;
 					}
 					f->wp=f->rp=f->buf;
@@ -35,7 +36,8 @@ size_t fwrite(const void *p, size_t recl, size_t nrec, FILE *f){
 					lseek(f->fd, 0L, SEEK_END);
 				d=write(f->fd, s, n);
 				if(d<=0){
-					f->state=ERR;
+					if(f->state!=CLOSED)
+						f->state=ERR;
 					goto ret;
 				}
 			}else{

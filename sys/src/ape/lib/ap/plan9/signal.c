@@ -37,21 +37,23 @@ static struct {
 
 void	(*_sighdlr[MAXSIG+1])(int, char*, Ureg*); /* 0 initialized: SIG_DFL */
 
-/* must match signal.h: extern void (*signal(int, void (*)()))(); */
-//void (*signal(int sig, void (*func)(int, char*, Ureg*)))(int, char*, Ureg*)
+/* consider moving to <signal.h> */
+typedef void (*sighandler_t)(int);
+typedef void (*isighandler_t)(int, char*, Ureg*);
+
 void
-(*signal(int sig, void (*func)()))()
+(*signal(int sig, void (*func)(int)))(int)
 {
-	void(*oldf)(int, char*, Ureg*);
+	sighandler_t oldf;
 
 	if(sig <= 0 || sig > MAXSIG){
 		errno = EINVAL;
 		return SIG_ERR;
 	}
-	oldf = _sighdlr[sig];
+	oldf = (sighandler_t)_sighdlr[sig];
 	if(sig == SIGKILL)
 		return oldf;	/* can't catch or ignore SIGKILL */
-	_sighdlr[sig] = func;
+	_sighdlr[sig] = (isighandler_t)func;
 	return oldf;
 }
 
@@ -90,12 +92,14 @@ sigaction(int sig, struct sigaction *act, struct sigaction *oact)
 
 /* this is registered in _envsetup */
 int
-_notehandler(void *u, char *msg)
+_notehandler(void *v, char *msg)
 {
 	int i;
 	void(*f)(int, char*, Ureg*);
+	Ureg *u;
 	extern void _doatexits(void);	/* in stdio/exit.c */
 
+	u = v;
 	if(_finishing)
 		_finish(0, 0);
 	for(i = 0; i<NSIGTAB; i++){

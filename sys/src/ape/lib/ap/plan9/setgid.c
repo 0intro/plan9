@@ -7,8 +7,9 @@
  */
 
 int
-setgid(gid_t)
+setgid(gid_t gid)
 {
+	USED(gid);
 	errno = EPERM;
 	return -1;
 }

@@ -6,13 +6,13 @@
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 /* bsd extensions */
 #include <sys/uio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/un.h>
-#include <sys/stat.h>
 
 #include "priv.h"
 
@@ -20,14 +20,13 @@ int
 connect(int fd, void *a, int alen)
 {
 	Rock *r;
-	int n, cfd, nfd;
-	char msg[8+256+1], file[8+256+1];
-	struct sockaddr_in *lip, *rip;
+	int n, cfd, nfd, lport, rport;
+	char msg[8+256+1], file[8+256+1], rip[48], *rflag;
 	struct sockaddr_un *runix;
 	static int vers;
 
 	r = _sock_findrock(fd, 0);
-	if(r == 0){
+	if(r == nil){
 		errno = ENOTSOCK;
 		return -1;
 	}
@@ -39,23 +38,23 @@ connect(int fd, void *a, int alen)
 
 	switch(r->domain){
 	case PF_INET:
+	case PF_INET6:
 		/* set up a tcp or udp connection */
 		cfd = open(r->ctl, O_RDWR);
 		if(cfd < 0){
 			_syserrno();
 			return -1;
 		}
-		rip = a;
-		lip = (struct sockaddr_in*)&r->addr;
-		if(lip->sin_port)
+
+		_sock_ntop(r->domain, &r->raddr, rip, sizeof rip, &rport);
+		_sock_ntop(r->domain, &r->addr, nil, 0, &lport);
+		rflag = r->reserved? "!r": "";
+		if(lport)
 			snprintf(msg, sizeof msg, "connect %s!%d%s %d",
-				inet_ntoa(rip->sin_addr), ntohs(rip->sin_port),
-				r->reserved ? "!r" : "",
-				ntohs(lip->sin_port));
+				rip, rport, rflag, lport);
 		else
 			snprintf(msg, sizeof msg, "connect %s!%d%s",
-				inet_ntoa(rip->sin_addr), ntohs(rip->sin_port),
-				r->reserved ? "!r" : "");
+				rip, rport, rflag);
 		n = write(cfd, msg, strlen(msg));
 		if(n < 0){
 			_syserrno();

@@ -1,21 +1,28 @@
 #include <errno.h>
+#include <inttypes.h>
 #include <unistd.h>
 #include "lib.h"
 #include "sys9.h"
 
 ssize_t
-write(int d, const void *buf, size_t nbytes)
+pwrite(int fd, const void *buf, size_t nbytes, off_t off)
 {
 	int n;
 
-	if(d<0 || d>=OPEN_MAX || !(_fdinfo[d].flags&FD_ISOPEN)){
+	if(fd<0 || fd>=OPEN_MAX || !(_fdinfo[fd].flags&FD_ISOPEN)){
 		errno = EBADF;
 		return -1;
 	}
-	if(_fdinfo[d].oflags&O_APPEND)
-		_SEEK(d, 0, 2);
-	n = _WRITE(d, buf, nbytes);
+	if(_fdinfo[fd].oflags&O_APPEND)
+		_SEEK(fd, 0, 2);
+	n = _PWRITE(fd, buf, nbytes, off);
 	if(n < 0)
 		_syserrno();
 	return n;
+}
+
+ssize_t
+write(int fd, const void *buf, size_t nbytes)
+{
+	return pwrite(fd, buf, nbytes, -1ll);
 }

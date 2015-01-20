@@ -9,14 +9,14 @@ lstat(char *name, struct stat *ans)
 }
 
 int
-symlink(char *, char *)
+symlink(char*, char*)
 {
 	errno = EPERM;
 	return -1;
 }
 
 int
-readlink(char *, char *, int )
+readlink(char*, char*, int)
 {
 	errno = EIO;
 	return -1;

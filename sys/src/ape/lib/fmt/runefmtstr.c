@@ -14,6 +14,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#define _SUSV2_SOURCE
+#include <inttypes.h>
 #include "utf.h"
 #include "fmt.h"
 #include "fmtdef.h"
@@ -24,7 +26,7 @@ runeFmtStrFlush(Fmt *f)
 	Rune *s;
 	int n;
 
-	n = (int)f->farg;
+	n = (int)(uintptr_t)f->farg;
 	n += 256;
 	f->farg = (void*)n;
 	s = (Rune*)f->start;

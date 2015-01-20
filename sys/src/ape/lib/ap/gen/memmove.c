@@ -11,7 +11,7 @@ memmove(void *a1, const void *a2, size_t n)
 	if(a1 > a2)
 		goto back;
 	s1 = a1;
-	s2 = a2;
+	s2 = (char*)a2;
 	while(n > 0) {
 		*s1++ = *s2++;
 		n--;

@@ -20,4 +20,4 @@ UPDATE=mkfile\
 </sys/src/cmd/mksyslib
 
 %.$O:	../../../../libsec/386/%.s
-	$AS ../../../../libsec/386/$stem.s
+	$AS $AFLAGS ../../../../libsec/386/$stem.s

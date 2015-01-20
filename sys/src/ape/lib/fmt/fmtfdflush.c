@@ -13,6 +13,8 @@
  */
 #include <stdarg.h>
 #include <unistd.h>
+#define _SUSV2_SOURCE
+#include <inttypes.h>
 #include "fmt.h"
 #include "fmtdef.h"
 
@@ -26,7 +28,7 @@ __fmtFdFlush(Fmt *f)
 	int n;
 
 	n = (char*)f->to - (char*)f->start;
-	if(n && write((int)f->farg, f->start, n) != n)
+	if(n && write((int)(uintptr_t)f->farg, f->start, n) != n)
 		return 0;
 	f->to = f->start;
 	return 1;

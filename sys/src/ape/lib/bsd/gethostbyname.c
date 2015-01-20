@@ -26,17 +26,17 @@ enum
  *  for inet addresses only
  */
 struct hostent*
-gethostbyname(const char *name)
+gethostbyname(char *name)
 {
 	int i, t, fd, m;
 	char *p, *bp;
-	int nn, na;
-	unsigned long x;
+	int nn, na, na6;
 	static struct hostent h;
 	static char buf[1024];
 	static char *nptr[Nname+1];
 	static char *aptr[Nname+1];
-	static char addr[Nname][4];
+	static char addr4[Nname][4];
+	static char addr6[Nname][16];
 
 	h.h_name = 0;
 	t = _sock_ipattr(name);
@@ -79,7 +79,7 @@ gethostbyname(const char *name)
 	buf[i] = 0;
 
 	/* parse the reply */
-	nn = na = 0;
+	nn = na = na6 = 0;
 	for(bp = buf;;){
 		p = strchr(bp, '=');
 		if(p == 0)
@@ -94,15 +94,12 @@ gethostbyname(const char *name)
 			if(nn < Nname)
 				nptr[nn++] = p;
 		} else if(strcmp(bp, "ip") == 0){
-			x = inet_addr(p);
-			x = ntohl(x);
-			if(na < Nname){
-				addr[na][0] = x>>24;
-				addr[na][1] = x>>16;
-				addr[na][2] = x>>8;
-				addr[na][3] = x;
-				aptr[na] = addr[na];
-				na++;
+			if(strchr(p, ':') != nil){
+				if(inet_pton(AF_INET6, p, addr6[na6]) == 1)
+					na6++;
+			}else{
+				if(inet_pton(AF_INET, p, addr4[na]) == 1)
+					na++;
 			}
 		}
 		while(*p && *p != ' ')
@@ -111,17 +108,29 @@ gethostbyname(const char *name)
 			*p++ = 0;
 		bp = p;
 	}
-	if(nn+na == 0){
+	if(nn+na+na6 == 0){
 		h_errno = HOST_NOT_FOUND;
 		return 0;
 	}
 
 	nptr[nn] = 0;
-	aptr[na] = 0;
+
+	if(na == 0){
+		for(i = 0; i < na6; i++)
+			aptr[i] = addr6[i];
+		aptr[i] = 0;
+		h.h_addrtype = AF_INET6;
+		h.h_length = 16;
+	}else{
+		for(i = 0; i < na; i++)
+			aptr[i] = addr4[i];
+		aptr[i] = 0;
+		h.h_addrtype = AF_INET;
+		h.h_length = 4;
+	}
+
 	h.h_aliases = nptr;
 	h.h_addr_list = aptr;
-	h.h_length = 4;
-	h.h_addrtype = AF_INET;
 	if(h.h_name == 0)
 		h.h_name = nptr[0];
 	if(h.h_name == 0)
